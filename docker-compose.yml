@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # --- 1. MongoDB Database Service ---
+  mongodb:
+    image: mongo:latest
+    # Store data outside the container for persistence
+    volumes:
+      - mongodb_data:/data/db
+    # This port is ONLY used internally by the backend service.
+    # We do NOT expose it to the host machine for security.
+    expose:
+      - "27017"
+    networks:
+      - app_network
+    restart: always
+
+  # --- 2. Backend Service (Flask) ---
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.backend
+    # Expose the backend API to the host on port 8000
+    ports:
+      - "8000:5000" # Host_Port:Container_Port
+    # Wait for the database to be up before starting the backend
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+    restart: always
+
+  # --- 3. Frontend Service (Nginx) ---
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.frontend
+    # Expose the web frontend to the host on port 80
+    ports:
+      - "80:80" # Host_Port:Container_Port
+    # Wait for the backend to be available (optional but good practice)
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    restart: always
+
+# --- Volumes for persistent data storage ---
+volumes:
+  mongodb_data:
+
+# --- Network for services to communicate ---
+networks:
+  app_network:
+    driver: bridge

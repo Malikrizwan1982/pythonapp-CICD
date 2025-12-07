@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple CI/CD App</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        #counter-value { font-size: 3em; color: #3498db; margin: 20px 0; }
+        button { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #2ecc71; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>CI/CD Counter App</h1>
+    <p>This is a simple app to test your Jenkins pipeline.</p>
+    
+    <h2>Current Count:</h2>
+    <div id="counter-value">Loading...</div>
+    
+    <button onclick="incrementCounter()">Increment Counter</button>
+
+    <script>
+        // NOTE: The port for the backend is 8000 when accessed from outside Docker, 
+        // but within the browser's context, you access it via the port exposed by docker-compose.
+        // If you are accessing this from your RHEL host, the backend is likely on port 8000.
+        const API_URL = 'http://localhost:8000/api'; 
+        // IMPORTANT: Adjust the port 8000 above to match the one you expose in your docker-compose.yml for the backend.
+
+        async function fetchCounter() {
+            try {
+                const response = await fetch(`${API_URL}/counter`);
+                const data = await response.json();
+                document.getElementById('counter-value').innerText = data.value;
+            } catch (error) {
+                console.error('Error fetching counter:', error);
+                document.getElementById('counter-value').innerText = 'Error loading count';
+            }
+        }
+
+        async function incrementCounter() {
+            try {
+                await fetch(`${API_URL}/increment`, { method: 'POST' });
+                // Refresh the display after incrementing
+                fetchCounter();
+            } catch (error) {
+                console.error('Error incrementing counter:', error);
+            }
+        }
+
+        // Load the initial counter value when the page loads
+        window.onload = fetchCounter;
+    </script>
+</body>
+</html>
