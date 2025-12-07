@@ -22,7 +22,7 @@
         // NOTE: The port for the backend is 8000 when accessed from outside Docker, 
         // but within the browser's context, you access it via the port exposed by docker-compose.
         // If you are accessing this from your RHEL host, the backend is likely on port 8000.
-        const API_URL = 'http://localhost:8000/api'; 
+        const API_URL = 'http://${window.location.hostname}:8000/api'; 
         // IMPORTANT: Adjust the port 8000 above to match the one you expose in your docker-compose.yml for the backend.
 
         async function fetchCounter() {
