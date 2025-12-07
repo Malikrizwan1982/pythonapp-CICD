@@ -35,8 +35,8 @@ pipeline {
                 // Stop and remove previous services, then start new ones using the current configuration
                 // The `-d` flag runs the containers in detached mode (in the background)
                 echo 'Tearing down old services and deploying new ones...'
-                sh 'docker-compose down' // Stop and remove existing containers/networks
-                sh 'docker-compose up -d --build' // Build and start new services
+                sh 'docker compose down' // Stop and remove existing containers/networks
+                sh 'docker compose up -d --build' // Build and start new services
             }
         }
 
